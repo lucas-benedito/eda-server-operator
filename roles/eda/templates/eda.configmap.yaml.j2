@@ -99,6 +99,14 @@ data:
 
             sendfile on;
 
+            # Security headers - IMPORTANT: nginx drops ALL server-level add_header
+            # directives from any location block that defines its own add_header.
+            # If you add add_header to a location block, you must duplicate these
+            # headers there as well.
+            add_header Strict-Transport-Security max-age=15768000;
+            add_header X-Frame-Options "DENY";
+            add_header X-Content-Type-Options nosniff;
+
             root /usr/share/nginx/html;
 
             location ~ ^/api/eda {
@@ -115,6 +123,9 @@ data:
             }
 
             location ~* \.(json|woff|woff2|jpe?g|png|gif|ico|svg|css|js)$ {
+                add_header Strict-Transport-Security max-age=15768000;
+                add_header X-Frame-Options "DENY";
+                add_header X-Content-Type-Options nosniff;
                 add_header Cache-Control "public, max-age=31536000, s-maxage=31536000, immutable";
                 try_files $uri =404;
                 gzip_static on;
@@ -123,6 +134,9 @@ data:
             location / {
                 autoindex off;
                 expires off;
+                add_header Strict-Transport-Security max-age=15768000;
+                add_header X-Frame-Options "DENY";
+                add_header X-Content-Type-Options nosniff;
                 add_header Cache-Control "public, max-age=0, s-maxage=0, must-revalidate" always;
                 try_files $uri $uri/ /index.html =404;
             }
